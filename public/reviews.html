@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Community Reviews - Food Truck</title>
+  <style>
+    body {
+      background: #f4f7fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #ff7f50;
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    h2 {
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .review-form-section {
+      background: white;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      margin-bottom: 3rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #ff7f50;
+      box-shadow: 0 0 8px rgba(255,127,80,0.4);
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      background: #ff7f50;
+      color: white;
+      padding: 0.9rem 2rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      align-self: flex-start;
+    }
+
+    button:hover {
+      background: #e06a3c;
+    }
+
+    .form-message {
+      margin-top: 0.5rem;
+      font-weight: 600;
+    }
+
+    .reviews-container {
+      background: white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .review {
+      border-bottom: 1px solid #eee;
+      padding: 1.5rem 0;
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .review:last-child {
+      border-bottom: none;
+    }
+
+    .review p {
+      font-style: italic;
+      font-size: 1.15rem;
+      color: #555;
+      margin-bottom: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .stars {
+      color: #ffb400;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .reviewer {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #222;
+      text-align: right;
+      letter-spacing: 0.05em;
+    }
+
+    .date {
+      font-size: 0.8rem;
+      color: #999;
+      text-align: right;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .back-btn {
+      margin: 2rem auto 0;
+      background: #ff7f50;
+      color: white;
+      text-decoration: none;
+      padding: 0.8rem 2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 5px 15px rgba(255, 127, 80, 0.4);
+      display: inline-block;
+    }
+
+    .back-btn:hover {
+      background: #e06a3c;
+      box-shadow: 0 6px 20px rgba(224, 106, 60, 0.6);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Community Reviews</h1>
+
+  <section class="review-form-section">
+    <h2>Submit Your Review</h2>
+    <form id="reviewForm">
+      <input type="text" id="reviewer" name="reviewer" placeholder="Your Name" required />
+      <textarea id="reviewText" name="reviewText" placeholder="Write your review..." rows="4" required></textarea>
+      <select id="rating" name="rating" required>
+        <option value="" disabled selected>Rate (1 to 5 stars)</option>
+        <option value="1">⭐☆☆☆☆ - 1 Star</option>
+        <option value="2">⭐⭐☆☆☆ - 2 Stars</option>
+        <option value="3">⭐⭐⭐☆☆ - 3 Stars</option>
+        <option value="4">⭐⭐⭐⭐☆ - 4 Stars</option>
+        <option value="5">⭐⭐⭐⭐⭐ - 5 Stars</option>
+      </select>
+      <button type="submit">Submit Review</button>
+      <div id="formMessage" class="form-message"></div>
+    </form>
+  </section>
+
+  <section class="reviews-container" id="reviewsContainer">
+    <h2>Latest Reviews</h2>
+    <!-- Reviews will be appended here -->
+  </section>
+
+  <a href="index.html" class="back-btn">← Back to Home</a>
+
+  <script>
+    const reviewForm = document.getElementById('reviewForm');
+    const formMessage = document.getElementById('formMessage');
+    const reviewsContainer = document.getElementById('reviewsContainer');
+
+    // Helper to render stars based on rating number
+    function renderStars(rating) {
+      const fullStar = '⭐';
+      const emptyStar = '☆';
+      return fullStar.repeat(rating) + emptyStar.repeat(5 - rating);
+    }
+
+    // Render a single review element
+    function createReviewElement({ reviewer, reviewText, rating, date }) {
+      const div = document.createElement('div');
+      div.classList.add('review');
+      div.innerHTML = `
+        <p>“${reviewText}”</p>
+        <div class="stars">${renderStars(rating)}</div>
+        <div class="reviewer">— ${reviewer}</div>
+        <div class="date">${new Date(date).toLocaleDateString()}</div>
+      `;
+      return div;
+    }
+
+    // Append a new review to the container
+    function appendReview(review) {
+      const el = createReviewElement(review);
+      reviewsContainer.appendChild(el);
+    }
+
+    // Dummy reviews to start with (you can remove this after fetching real ones)
+    const dummyReviews = [
+      { reviewer: "Jamie", reviewText: "The Loaded Burger blew me away with its juicy flavors!", rating: 5, date: "2025-09-20" },
+      { reviewer: "Alex", reviewText: "Fresh Salad was so refreshing, perfect for summer!", rating: 4, date: "2025-09-18" },
+      { reviewer: "Priya", reviewText: "Tacos brought all the heat and flavor. Love it!", rating: 5, date: "2025-09-19" }
+    ];
+    dummyReviews.forEach(appendReview);
+
+    // Handle form submission
+    reviewForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      formMessage.textContent = '';
+
+      const reviewer = reviewForm.reviewer.value.trim();
+      const reviewText = reviewForm.reviewText.value.trim();
+      const rating = reviewForm.rating.value;
+
+      if (!reviewer || !reviewText || !rating) {
+        formMessage.textContent = 'Please fill all fields.';
+        formMessage.style.color = 'red';
+        return;
+      }
+
+      try {
+        const response = await fetch('/review', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reviewer, reviewText, rating: Number(rating) }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          formMessage.textContent = result.message;
+          formMessage.style.color = 'green';
+
+          // Add the new review to the list on the page
+          appendReview({ reviewer, reviewText, rating: Number(rating), date: new Date().toISOString() });
+
+          // Reset the form
+          reviewForm.reset();
+        } else {
+          formMessage.textContent = result.message || 'Failed to submit review.';
+          formMessage.style.color = 'red';
+        }
+      } catch (err) {
+        formMessage.textContent = 'Error submitting review. Try again later.';
+        formMessage.style.color = 'red';
+      }
+    });
+  </script>
+</body>
+</html>
